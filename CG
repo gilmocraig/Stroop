@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="quiz" style="position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%); text-align: center;"></div>
+
+<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+  <button id="start" onclick="startTest()">Start Test</button>
+
+  <button id="red" onclick="submitAnswer('Red')" style="display: none;">Red</button>
+  <button id="green" onclick="submitAnswer('Green')" style="display: none;">Green</button>
+  <button id="blue" onclick="submitAnswer('Blue')" style="display: none;">Blue</button>
+  <button id="yellow" onclick="submitAnswer('Yellow')" style="display: none;">Yellow</button>
+  <button id="purple" onclick="submitAnswer('Purple')" style="display: none;">Purple</button>
+</div>
+
+<script>
+var questions = [
+  {color: 'Red', correctAnswer: 'Green'},
+  {color: 'Green', correctAnswer: 'Blue'},
+  {color: 'Blue', correctAnswer: 'Yellow'},
+  {color: 'Yellow', correctAnswer: 'Purple'},
+  {color: 'Purple', correctAnswer: 'Red'},
+  // Repeat the questions to have a total of 20 questions
+  {color: 'Red', correctAnswer: 'Green'},
+  {color: 'Green', correctAnswer: 'Blue'},
+  {color: 'Blue', correctAnswer: 'Yellow'},
+  {color: 'Yellow', correctAnswer: 'Purple'},
+  {color: 'Purple', correctAnswer: 'Red'},
+  {color: 'Red', correctAnswer: 'Green'},
+  {color: 'Green', correctAnswer: 'Blue'},
+  {color: 'Blue', correctAnswer: 'Yellow'},
+  {color: 'Yellow', correctAnswer: 'Purple'},
+  {color: 'Purple', correctAnswer: 'Red'},
+  {color: 'Red', correctAnswer: 'Green'},
+  {color: 'Green', correctAnswer: 'Blue'},
+  {color: 'Blue', correctAnswer: 'Yellow'},
+  {color: 'Yellow', correctAnswer: 'Purple'},
+  {color: 'Purple', correctAnswer: 'Red'},
+];
+
+var answers = [];
+var currentQuestion = 0;
+var startTime;
+
+function showQuestion() {
+  if (currentQuestion < questions.length) {
+    var question = questions[currentQuestion];
+    document.getElementById('quiz').innerHTML = 
+      `<div class="question" style="color:${question.color}; font-size: 30px;"> ${question.correctAnswer} </div>`;
+    
+    startTime = new Date();
+
+    setTimeout(function() {
+      document.getElementById('quiz').innerHTML = '';
+    }, 350);  // Remove the question after 350ms
+  }
+}
+
+function submitAnswer(answer) {
+  var endTime = new Date();
+  var timeTaken = endTime - startTime;  // Time taken in milliseconds
+  var isCorrect = (answer === questions[currentQuestion].correctAnswer) ? 1 : 0;  // Check if the answer is correct and represent it as 1 or 0
+
+  answers.push({
+    question: currentQuestion,
+    answer: answer,
+    timeTaken: timeTaken,
+    isCorrect: isCorrect  // Add this line
+  });
+
+  currentQuestion++;
+
+  // Check if it's the 20th question
+  if (currentQuestion == 20) {
+    document.getElementById('quiz').innerHTML = 
+      "Thank you. Unfortunately your performance was under 40% of the average participant. Please focus for the final test.";
+
+    // Display the next message after 5 seconds
+    setTimeout(function() {
+      document.getElementById('quiz').innerHTML = "Please close this test window.";
+    }, 5000);  // 5000ms = 5s
+
+    // Create CSV file
+    var csv = 'Question,Answer,Time Taken,Is Correct\n';  // Add 'Is Correct' to the header
+    answers.forEach(function(answer) {
+      csv += answer.question + ',' + answer.answer + ',' + answer.timeTaken + ',' + answer.isCorrect + '\n';  // Add answer.isCorrect to each row
+    });
+
+    // Create download link
+    var downloadLink = document.createElement('a');
+    downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+    downloadLink.download = 'answers.csv';
+
+    // Add the link to the body and click it to start the download
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  } else {
+    showQuestion();
+  }
+}
+
+function startTest() {
+  // Hide the start button
+  document.getElementById('start').style.display = 'none';
+
+  // Show the color buttons
+  document.getElementById('red').style.display = 'inline';
+  document.getElementById('green').style.display = 'inline';
+  document.getElementById('yellow').style.display = 'inline';
+  document.getElementById('blue').style.display = 'inline';
+  document.getElementById('purple').style.display = 'inline';
+
+  // Start the test
+  showQuestion();
+}
+
+</script>
+
+</body>
+</html>
